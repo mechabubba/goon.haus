@@ -3,11 +3,16 @@
 
 * { box-sizing: border-box; }
 
-body {
-    min-height: 100vh;
-    min-width: 100vw;
+html, body {
     margin: 0;
     padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: fill-available;
+    font-size: 16px;
     font-family: 'Roboto', sans-serif;
     line-height: 1.2;
 }
@@ -24,7 +29,9 @@ a:hover, a:focus, a:active {
     text-decoration: underline;
 }
 
-h3 { margin: 25px auto auto auto; }
+h1, h2, h3, h4, h5, h6 {
+    margin: 16px 0;
+}
 
 code, .code_i { display: inline; padding: 2px 4px; font-family: 'Roboto Mono', monospace; line-height: 1.1; font-size: 15px; color: #cccccc; background-color: rgba(0, 0, 0, 0.5); border-radius: 5px; white-space: nowrap }
 
