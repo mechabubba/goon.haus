@@ -59,7 +59,7 @@
                 camera.position.set(100, 80, 20)
                 camera.lookAt(scene.position.x, scene.position.y + 35, scene.position.z);
 
-                const light = new THREE.AmbientLight(0x999999);
+                const light = new THREE.AmbientLight(0xFFFFFF);
                 scene.add(light);
 
                 loader = new GLTFLoader();
@@ -85,6 +85,12 @@
             }
 
             init();
+
+            window.onresize = () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight)
+            };
         </script>
     </body>
 </html>
