@@ -1,8 +1,10 @@
+<!doctype html>
 <html>
     <head>
         <title>mechabubba's homepage</title>
         <link rel="icon" type="image/png" href="assets/favicon.png">
         <link rel="stylesheet" href="shared.css">
+        <meta charset="utf-8">
         <meta property="og:title" itemprop="name" content="mechabubba's homepage">
         <meta property="og:type" content="website">
         <meta property="og:image" content="https://goon.haus/assets/avatar.png">
@@ -19,6 +21,7 @@
                 flex-direction: column;
                 justify-content: space-evenly;
                 align-items: center;
+                overflow: hidden;
             }
             #cordon {
                 position: absolute;
@@ -27,6 +30,7 @@
             .infobox {
                 padding: 0 20px;
                 margin: 0 20px;
+                width: 400px;
                 border: 2px solid rgba(255, 255, 255, 0.6);
                 border-radius: 16px;
                 background-color:rgba(0, 0, 0, 0.5);
@@ -47,6 +51,9 @@
                 color: transparent;
                 vertical-align: middle;
             }
+            ul, li {
+                margin: 0;
+            }
         </style>
     </head>
     <body>
@@ -55,8 +62,14 @@
                 <img class="avatar" src="assets/avatar.png">
                 <span class="header">hey, i'm steve</span> 🌊
             </h1>
-            <p>I'm a computer science student. On most sites, I go by mechabubba.</p>
+            <p>I'm a computer science student. On most sites, I go by either mechabubba or Steven. You may be looking for...
+                <ul>
+                    <li><a href="bear/">bear,</a> my Discord bot</li>
+                    <li><a href="https://func.zone">func.zone</a></li>
+                </ul>
+            </p>
             <p>
+                Follow me elsewhere; <br>
                 <a href="https://github.com/mechabubba">Github</a> | <a href="http://steamcommunity.com/profiles/76561198058209703">Steam</a> | <a href="https://twitter.com/mechabubba">Twitter</a>
             </p>
         </div>
@@ -76,6 +89,12 @@
                 const light = new THREE.AmbientLight(0xFFFFFF);
                 scene.add(light);
 
+                renderer = new THREE.WebGLRenderer();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                let elem = renderer.domElement;
+                elem.id = "cordon";
+                document.body.appendChild(elem);
+
                 loader = new GLTFLoader();
                 loader.load("assets/cordon.gltf", (gltf) => {
                     console.log("he's here...")
@@ -84,12 +103,6 @@
                     renderer.render(scene, camera);
                     animate();
                 });
-
-                renderer = new THREE.WebGLRenderer();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                let elem = renderer.domElement;
-                elem.id = "cordon";
-                document.body.appendChild(elem);
             }
 
             function animate() {
