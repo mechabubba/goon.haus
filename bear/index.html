@@ -15,14 +15,35 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             html { background-color: #212121; }
-            body, .container, .about {
+            body, .wrapper {
                 color: white;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 flex-direction: column;
             }
-            .container, .about { width: 275px; }
+            .wrapper > * { max-width: 275px; }
+            .title {
+                font-weight: 800;
+                margin-bottom: 4px;
+                color: transparent;
+                background: linear-gradient(90deg, #ff7777, #ffc37e, #fdff7a, #96ff70, #6bdcff, #6070ff, #aa75ff, #ff78e2);
+                background-size: 200% 200%;
+                background-repeat: repeat;
+                background-clip: text;
+                -webkit-background-clip: text;
+                animation: grad 4s linear infinite;
+                -webkit-animation: grad 4s linear infinite;
+            }
+            @keyframes grad {
+                0% { background-position: 0 0; }
+                100% { background-position: 200% 0; }
+            }
+            .subtitle {
+                font-style: italic;
+                color: #AAAAAA;
+                margin: 0;
+            }
             .about {
                 text-align: center;
                 background-color: rgba(0, 0, 0, 0.5);
@@ -38,26 +59,28 @@
             hr {
                 height: 1px;
                 width: 90%;
-                margin: 0;
+                margin: 0 auto;
                 border: 0;
                 border-top: 2px dotted white;
             }
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="wrapper">
             <img src="assets/bear.gif" title="hey pal" alt="bear">
+            <div class="t_center">
+                <h1 class="title grad">bear</h1>
+                <p class="subtitle">"the greatest bot"</p>
+                <p><a href="https://discordapp.com/oauth2/authorize?&client_id=435224030459723776&scope=bot&permissions=8" class="c_rgb">Invite</a> | <a href="https://github.com/mechabubba/bear">Source</a> | <a href="./commands.html">Commands</a></p>
+            </div>
+            <div class="about">
+                <p>This is a Discord bot created by <span class="c_bl">@stev#7503.</span> Since its creation in 2017, it's slowly grown and become more and more complicated and feature-ful.</p>
+                <hr>
+                <p>Right now, it's written in Node.js using <a href="https://github.com/06000208/sandplate">sandplate,</a> a powerful bot framework.</p>
+            </div>
+            <div class="footer">
+                The bear itself is from <a href="https://www.bear-tracker.com/">bear-tracker.com</a> - since 2002!
+            </div>
         </div>
-        <div class="container">
-            <p><a href="https://discordapp.com/oauth2/authorize?&client_id=435224030459723776&scope=bot&permissions=8" class="c_rgb">Invite</a> | <a href="https://github.com/mechabubba/bear">Source</a> | <a href="./commands.html">Commands</a></p>
-        </div>
-        <div class="about">
-            <p>This is a Discord bot created by <span class="c_b">@stev#7503.</span> Since its creation in 2017, it's slowly grown and become more and more complicated and feature-ful.</p>
-            <hr>
-            <p>Right now, it's written in Node.js using <a href="https://github.com/06000208/sandplate">sandplate,</a> a powerful bot framework.</p>
-        </div>
-        <div class="footer">
-            The bear itself originated from <a href="https://www.bear-tracker.com/">bear-tracker.com</a> - since 2002!
-        </span>
     </body>
 </html>

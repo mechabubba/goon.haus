@@ -35,36 +35,21 @@ h1, h2, h3, h4, h5, h6 {
 code { display: inline; padding: 2px 4px; font-family: 'Roboto Mono', monospace; line-height: 1.1; font-size: 15px; color: #cccccc; background-color: rgba(0, 0, 0, 0.5); border-radius: 5px; white-space: nowrap }
 
 /* colors */
-.c_r { color: #FF6961 }
-.c_y { color: #F1EA7F }
-.c_g { color: #77DD77 }
-.c_b { color: #7289DA }
-.c_rgb { color: #FF2B6B; animation: rainbow_cycle 3.5s infinite linear; transition: .3s; }
+.c_r { color: #ff7777 }
+.c_y { color: #fdff7a }
+.c_g { color: #96ff70 }
+.c_b { color: #6bdcff }
+.c_bl { color: #7289DA }
+.c_rgb { color: #ff7777; animation: rainbow_cycle 3.5s infinite linear; transition: .3s; }
 @keyframes rainbow_cycle {
-    12.5% {
-        color: #FF3737;
-    }
-    25% {
-        color: #FF8800;
-    }
-    37.5% {
-        color: #FFe605;
-    }
-    50% {
-        color: #09FF09;
-    }
-    62.5% {
-        color: #00b7FF;
-    }
-    75% {
-        color: #1919FF;
-    }
-    87.5% {
-        color: #911ECA;
-    }
-    100% {
-        color: #ff2C9D;
-    }
+    12.5% { color: #ff7777; }
+    25%   { color: #ffc37e; }
+    37.5% { color: #fdff7a; }
+    50%   { color: #96ff70; }
+    62.5% { color: #6bdcff; }
+    75%   { color: #6070ff; }
+    87.5% { color: #aa75ff; }
+    100%  { color: #ff78e2; }
 }
 .c_semitrans { opacity: 0.5; }
 .c_supertrans { opacity: 0.25; }
