@@ -42,14 +42,15 @@ code { display: inline; padding: 2px 4px; font-family: 'Roboto Mono', monospace;
 .c_bl { color: #7289DA }
 .c_rgb { color: #ff7777; animation: rainbow_cycle 3.5s infinite linear; transition: .3s; }
 @keyframes rainbow_cycle {
-    12.5% { color: #ff7777; }
-    25%   { color: #ffc37e; }
-    37.5% { color: #fdff7a; }
-    50%   { color: #96ff70; }
-    62.5% { color: #6bdcff; }
-    75%   { color: #6070ff; }
-    87.5% { color: #aa75ff; }
-    100%  { color: #ff78e2; }
+    11%  { color: #ff7777; }
+    22%  { color: #ffc37e; }
+    33%  { color: #fdff7a; }
+    44%  { color: #96ff70; }
+    55%  { color: #6bdcff; }
+    66%  { color: #6070ff; }
+    77%  { color: #aa75ff; }
+    88%  { color: #ff78e2; }
+    100% { color: #ff7777; }
 }
 .c_semitrans { opacity: 0.5; }
 .c_supertrans { opacity: 0.25; }
