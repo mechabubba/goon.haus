@@ -171,13 +171,13 @@ const canvas = document.getElementById("langton");
  */
 canvas.style.width = document.body.clientWidth + "px";
 canvas.style.height = document.body.clientHeight + "px";
-canvas.setAttribute("width", c(+getComputedStyle(canvas).getPropertyValue("width").slice(0, -2)));
-canvas.setAttribute("height", c(+getComputedStyle(canvas).getPropertyValue("height").slice(0, -2)));
+canvas.setAttribute("width", c(+canvas.style.width.slice(0, -2)));
+canvas.setAttribute("height", c(+canvas.style.height.slice(0, -2)));
 
 const langton = new LangtonGrid(canvas, ["000000FF", "00000000"]);
 canvas.addEventListener("click", (ev) => {
     langton.spawnAnt(new Ant(c(ev.clientX), c(ev.clientY)))
 });
 
-langton.spawnPack(langton.width / 2 >> 0, langton.height / 2 >> 0, 10, 5);
+langton.spawnPack(Math.floor(langton.width / 2), Math.floor(langton.height / 2), 10, 5);
 langton.start();
