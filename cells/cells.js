@@ -11,8 +11,11 @@
  */
 
 /**
- * @todo for some ungodly reason, LangtonsAnt gets **faster** on each reset(). i have no idea why. it'd be cool to have it fast all the time...
- * 
+ * @todo a few things.
+ * - **the big one:** for some ungodly reason, LangtonsAnt gets **faster** on each reset(). i have no idea why. it'd be cool to have it fast all the time...
+ * - on some rows and columns pixels are malformed. see: https://b.catgirlsare.sexy/jf-krTsZWhlx.png, one horz line is narrower than the rest
+ * - line drawing might need to be rewritten
+ * - `??` operator doesnt work on some browsers
  */
 
 /**
@@ -204,9 +207,7 @@ class LangtonsAnt extends CellGrid {
             langton.spawnAnt(new Ant(Math.floor((ev.offsetX / window.devicePixelRatio) / this.zoom), Math.floor((ev.offsetY / window.devicePixelRatio) / this.zoom)))
         });
 
-        /**
-         * ## Drawing Stuff
-         */
+        /** ## Drawing Stuff */
         this.canvas.addEventListener("mousedown", (ev) => {
             if(ev.button !== 2) return;
             this._painting = true;
@@ -219,7 +220,6 @@ class LangtonsAnt extends CellGrid {
             this._painting = false;
         });
 
-        /** @todo line drawing should be rewritten honestly. kinda shitty... */ 
         this.canvas.addEventListener("mousemove", (ev) => {
             if(this._painting) {
                 let x1 = this._lastX ?? Math.floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
