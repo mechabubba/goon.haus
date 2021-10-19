@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>mechabubba's homepage</title>
-        <link rel="icon" type="image/png" href="assets/favicon.png">
+        <link rel="icon" type="image/png" href="/assets/favicon.png">
         <link rel="stylesheet" href="shared.css">
         <meta charset="utf-8">
         <meta property="og:title" itemprop="name" content="mechabubba's homepage">
@@ -14,59 +14,43 @@
         <meta name="theme-color" content="#ff5656">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            html { background-color: rgb(0, 0, 0); }
+            :root {
+                --bg-color: rgb(24, 24, 24);
+                --text-color: rgba(238, 238, 238);
+                --header-bg: linear-gradient(90deg, hsl(239, 100%, 70%) 0%, hsl(0, 100%, 70%) 50%, hsl(32, 100%, 70%) 100%);
+                --header-bg-avatar: hsl(239, 100%, 70%);
+            }
+            html { /* Inspired by Orteil, art from a close friend. */
+                background-image: url("assets/tile.png");
+                background-color: var(--bg-color);
+                color: var(--text-color);
+            }
             body {
-                color: #eeeeee;
                 display: flex;
-                justify-content: center;
                 align-items: center;
+                justify-content: center;
             }
-            #langton {
-                background: rgb(255, 255, 255);
-                background: linear-gradient(45deg, rgb(255, 0, 255) 0%, rgb(127, 127, 255) 15%, rgb(0, 255, 255) 30%, rgb(0, 255, 127) 45%, rgb(255, 255, 0) 60%, rgb(255, 127, 0) 75%, rgb(255, 0, 0) 90%, rgb(255, 0, 255) 100%); 
-                position: absolute;
-                image-rendering: crisp-edges;
-                z-index: 0;
-            }
-            #close, #open {
-                position: absolute;
-                top: 0;
-                right: 0;
-                cursor: pointer;
-            }
-            #close { padding: 8px; }
-            #open {
-                padding: 4px 8px;
-                opacity: 0.5;
-                transition: 0.2s;
-                z-index: 1;
-            }
-            #open:hover, #open:focus, #open:active {
-                opacity: 1;
-            }
-            #open span {
-                display: inline-block;
-                transform: rotate(45deg);
-            }
-            #infobox {
+
+            #info {
                 position: relative;
-                padding: 0 20px;
-                width: 400px;
-                border: 2px solid rgba(255, 255, 255, 0.6);
+                padding: 0 16px;
+                margin: 16px 0;
+                width: 20%;
+                min-width: 325px;
+                background: rgba(0, 0, 0, 0.6);
+                border: 2px solid rgba(255, 255, 255, 0.5);
                 border-radius: 16px;
-                background: rgba(0, 0, 0, 0.75);
-                z-index: 1;
             }
             .avatar {
                 height: 40px;
                 width: 40px;
-                margin: 0 6px 0 0;
-                background-color: hsl(239, 100%, 69%);
+                margin: 0 12px 0 0;
+                background: var(--header-bg-avatar);
                 border-radius: 50%;
                 vertical-align: middle;
             }
             .header {
-                background: linear-gradient(90deg, hsl(239, 100%, 69%) 0%, hsl(0, 100%, 67%) 50%, hsl(32, 100%, 65%) 100%);
+                background: var(--header-bg);
                 background-clip: text;
                 -webkit-background-clip: text;
                 color: transparent;
@@ -76,50 +60,38 @@
                 position: absolute;
                 bottom: 0;
                 right: 0;
-                font-size: 10px;
+                font-size: 12px;
                 opacity: 0.5;
-                margin: 6px;
+                margin: 8px;
             }
-            ul, li {
-                margin: 0;
-            }
+            .footer > span { float: right; }
         </style>
     </head>
     <body>
-        <div id="infobox">
-            <h1>
-                <img class="avatar" src="assets/avatar.png">
-                <span class="header">hey, i'm steve</span> 🌊
-            </h1>
-            <p>
-                I'm a computer science student. On most sites, I go by either mechabubba or Steven. You may be looking for...
-                <ul>
-                    <li><a href="bear/">bear,</a> my Discord bot</li>
-                    <li><a href="https://func.zone">func.zone</a></li>
-                </ul>
-            </p>
-            <p>
-                Follow me elsewhere;<br>
-                <a href="https://github.com/mechabubba">Github</a> | <a href="http://steamcommunity.com/profiles/76561198058209703">Steam</a> | <a href="https://twitter.com/mechabubba">Twitter</a>
-            </p>
-            <span class="footer t_italics">Click the background to spawn an ant!</span>
-            <div id="close">✕</div>
+        <div id="info">
+            <div>
+                <h1>
+                    <img class="avatar" src="assets/avatar.png"><span class="header">hey, i'm steve</span> 🌊
+                </h1>
+                <p>
+                    <p>Welcome to my page! I'm a student studying computer science. In my free time I like to ride my bike, develop software, and play Team Fortress 2.</p>
+                    <p>On most sites, you can find me going by either mechabubba or Steven.</p>
+                    <p>You may be looking for...</p>
+                    <ul>
+                        <li>Information about <a href="/bear/">bear,</a> my Discord bot</li>
+                        <li><a href="https://func.zone">func.zone</a></li>
+                    </ul>
+                </p>
+                <p>
+                    Follow me elsewhere;<br>
+                    <a href="https://github.com/mechabubba">Github</a> | <a href="http://steamcommunity.com/profiles/76561198058209703">Steam</a> | <a href="https://twitter.com/mechabubba">Twitter</a>
+                </p>
+                <!--
+                <div class="footer">
+                    <span class="italics">I might want to put something here eventually.</span><br>
+                </div>
+                -->
+            </div>
         </div>
-        <div id="open" hidden><span>✕</span></div>
-        <canvas id="langton"></canvas>
-        <script src="js/langton.js"></script>
-        <script>
-            const infobox = document.getElementById("infobox");
-            const close = document.getElementById("close");
-            const open = document.getElementById("open");
-            close.addEventListener("click", () => {
-                infobox.setAttribute("hidden", "");
-                open.removeAttribute("hidden");
-            })
-            open.addEventListener("click", () => {
-                open.setAttribute("hidden", "");
-                infobox.removeAttribute("hidden");
-            })
-        </script>
     </body>
 </html>

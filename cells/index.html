@@ -1,0 +1,173 @@
+<html>
+    <head>
+        <title>cells.js</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/shared.css">
+        <style>
+            :root {
+                --color-pink: rgba(255, 102, 173);
+            }
+            html {
+                background: rgba(0, 0, 0);
+                color: rgba(255, 255, 255);
+            }
+            body {
+                display: flex;
+            }
+
+            body, select {
+                font-family: MS UI Gothic, monospace;
+                font-size: 12px;
+            }
+
+            h1 { margin: 0; }
+            a { color: var(--color-pink) }
+            a:hover, a:focus, a:active { color: var(--color-pink); filter: brightness(1.5); }
+
+            select {
+                height: 18px;
+                width: auto;
+                color: white;
+                border: 0;
+                border-radius: 4px;
+                background-color: rgba(0, 0, 0, 127);
+            }
+            select:hover, select:active { text-decoration: underline; }
+
+            .title {
+                color: var(--color-pink);
+                font-weight: bold;
+            }
+            #info {
+                background: rgb(0, 0, 0);
+                padding: 6px;
+                border-radius: 6px;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+            }
+
+            #cells {
+                position: absolute;
+                image-rendering: crisp-edges;
+                height: 100vh;
+                width: 100vw;
+                z-index: 0;
+            }
+            :not(#cells) { z-index: 1 }
+
+            .toolbar {
+                position: absolute;
+                display: flex;
+                flex-direction: row;
+                top: 0;
+                left: 0;
+                padding: 8px;
+                opacity: 0.5;
+                transition: 0.2s;
+            }
+            .toolbar > * { cursor: pointer; }
+            .toolbar > *:not(:last-child) {
+                margin-right: 4px;
+            }
+            .toolbar:hover, .toolbar:focus, .toolbar:active { opacity: 1; }
+        </style>
+    </head>
+    <body>
+        <div id="info">
+            <span class="title"># <a href="cells.js">cells.js</a></span><br>
+            Just a small JavaScript demo simulating cellular automata; in this case, Langton's Ant.<br>
+            Press left mouse to spawn an ant, drag right mouse to draw.<br>
+            Using <a href="http://www.famfamfam.com/lab/icons/silk/">silk icons</a> by Mark James.
+        </div>
+        <canvas id="cells"></canvas>
+        <div class="toolbar">
+            <div id="pause"><img src="/assets/silkicons/clock.png"></div>
+            <select id="rules">
+                <option value="RL" selected>RL - Default</option>
+                <option value="RLR">RLR - Chaotic</option>
+                <option value="LLRR">LLRR - Symmetric</option>
+                <option value="RLLR">RLLR - Symmetric 2</option>
+                <option value="LLRLRLL">LLRLRLL - Triangular</option>
+                <option value="LRRRRRLLR">LRRRRRLLR - Square</option>
+                <option value="LLRLRRLLL">LLRLRRLLL - Pyramid</option>
+                <option value="LLRRRLRLRLLR">LLRRRLRLRLLR - Convoluted Highway</option>
+                <option value="RRLLLRLLLRRR">RRLLLRLLLRRR - Triangle 2</option>
+            </select>
+        </div>
+        <script src="cells.js"></script>
+        <script>
+            const canvas = document.getElementById("cells");
+            const select = document.getElementById("rules");
+
+            function gradient(col1, col2, length) {
+                if(!(col1 instanceof Color) || !(col2 instanceof Color)) {
+                    throw new Error("col1 and col2 must be of the Color class.");
+                }
+                if(length === 2) return [col1, col2];
+
+                const colors = [];
+                for(let i = 0; i < length; i++) {
+                    let p = i / (length - 1);
+                    let r = Math.floor(col1.r * (1 - p) + col2.r * p);
+                    let g = Math.floor(col1.g * (1 - p) + col2.g * p);
+                    let b = Math.floor(col1.b * (1 - p) + col2.b * p);
+                    let a = Math.floor(col1.a * (1 - p) + col2.a * p);
+                    colors.push(new Color(r, g, b, a));
+                }
+                return colors;
+            }
+
+            const langton = new LangtonsAnt(canvas, {
+                alpha: true,
+                rule: select.value,
+                tiles: gradient(new Color(0, 0, 0), new Color(255, 255, 255), select.value.length),
+            });
+            const cx = Math.floor(canvas.width / 2);
+            const cy = Math.floor(canvas.height / 2);
+
+            const pause = document.getElementById("pause");
+            pause.addEventListener("click", () => {
+                if(langton.stopped) {
+                    langton.start();
+                } else {
+                    langton.stop();
+                }
+            })
+
+            function reset(rule) {
+                /* dumb <select> size shit */
+                const text = document.createTextNode(rule)
+                
+                langton.stop();
+                langton.ants = [new Ant(cx, cy)];
+                langton.rule = rule;
+                langton.tiles = gradient(new Color(0, 0, 0), new Color(255, 255, 255), rule.length);
+                langton.reset();
+            }
+
+            // literally the dumbest <select> sizing shit.
+            // the width of a <select> element is based on its largest child <option>. this makes it so that its based on its visible content.
+            // turns out its not easy and requires making an element to see how big *it* is, then setting *that* width to the select element.
+            // i thought it would look cool. please revoke my programming privelleges.
+            function sizeselect() {
+                const span = document.createElement("span");
+                span.appendChild(document.createTextNode(select.selectedOptions[0].innerText));
+                span.style.visibility = "hidden";
+                document.body.appendChild(span);
+                select.style.width = span.clientWidth + 22;
+                span.remove();
+            }
+            sizeselect();
+
+            select.addEventListener("change", (ev) => {
+                sizeselect();
+                reset(select.value);
+            });
+
+            langton.spawnAnt(new Ant(cx, cy));
+            langton.start(); // LAUNCH
+        </script>
+    </body>
+</html>

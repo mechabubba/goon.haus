@@ -28,17 +28,13 @@ a:hover, a:focus, a:active {
     text-decoration: underline;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    margin: 16px 0;
-}
+h1, h2, h3, h4, h5, h6 { margin: 16px 0; }
 
-[hidden] {
-    display: none !important;
-}
+[hidden] { display: none !important; }
 
 code { display: inline; padding: 2px 4px; font-family: 'Roboto Mono', monospace; line-height: 1.1; font-size: 15px; color: #cccccc; background-color: rgba(0, 0, 0, 0.5); border-radius: 5px; white-space: nowrap }
 
-/* colors */
+/* COLORS */
 .c_r { color: #ff7777 }
 .c_y { color: #fdff7a }
 .c_g { color: #96ff70 }
@@ -59,8 +55,8 @@ code { display: inline; padding: 2px 4px; font-family: 'Roboto Mono', monospace;
 .c_semitrans { opacity: 0.5; }
 .c_supertrans { opacity: 0.25; }
 
-/* text modifiers */
-.t_underline { text-decoration: underline; }
-.t_bold { font-weight: bold; }
-.t_italics { font-style: italic; }
+.underline { text-decoration: underline; }
+.bold { font-weight: bold; }
+.italics { font-style: italic; }
 .t_center { text-align: center; }
+.mono { font-family: 'Roboto Mono', monospace; }
