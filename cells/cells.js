@@ -1,6 +1,7 @@
 /** 
  * # cells.js
  * Cellular automata in the HTML canvas.
+ * ...and a few other little experiments. :)
  * Made with <3 by Steven (mechabubba) v1.0
  * 
  * Hosted at: https://goon.haus/cells/
@@ -13,9 +14,10 @@
 /**
  * @todo a few things.
  * - **the big one:** for some ungodly reason, LangtonsAnt gets **faster** on each reset(). i have no idea why. it'd be cool to have it fast all the time...
+ *   - possible speed solution: step the ants a few times, draw the screen, repeat
  * - on some rows and columns pixels are malformed. see: https://b.catgirlsare.sexy/jf-krTsZWhlx.png, one horz line is narrower than the rest
- * - line drawing might need to be rewritten
- * - `??` operator doesnt work on some browsers
+ * - there are a bunch of things on this page that wont work on older browsers (`??`, `static` class methods, etc).
+ *   - i dont *really* care, and i dont want to change anything drastically, but it may be good to support older browsers more.
  */
 
 /**
@@ -48,15 +50,86 @@ Number.prototype.byte = function() {
  */
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Shorthand for some functions.
+const abs = Math.abs;
+const floor = Math.floor;
+
+/** A class representing a 32 bit RGBA color. */
+class Color {
+    /**
+     * Constructs a color from given RGBA values.
+     * - Values, if not provided, default to random values clamped between 0 to 255. 
+     * - Alpha, if not provided, defaults to an opaque 255.
+     * @param {number|number[]} r - The red value. Alternatively, if an array is passed in, the color values are taken from this array and g, b, and a are ignored.
+     * @param {number} g - The green value.
+     * @param {number} b - The blue value.
+     * @param {number} a - The alpha value.
+     */
+    constructor(r, g, b, a = 255) {
+        if(Array.isArray(r)) {
+            this.r = abs(r[0] ?? Color.randomValue()) % 256 | 0;
+            this.g = abs(r[1] ?? Color.randomValue()) % 256 | 0;
+            this.b = abs(r[2] ?? Color.randomValue()) % 256 | 0;
+            this.a = abs(r[3] ?? Color.randomValue()) % 256 | 0;
+        } else {
+            this.r = abs(r ?? Color.randomValue()) % 256 | 0;
+            this.g = abs(g ?? Color.randomValue()) % 256 | 0;
+            this.b = abs(b ?? Color.randomValue()) % 256 | 0;
+            this.a = abs(a ?? Color.randomValue()) % 256 | 0;
+        }
+    }
+
+    /**
+     * Gets a string of the colors hexadecimal representation.
+     * @returns {string} A colors hexadecimal representation.
+     */
+    get hex() {
+        return this.r.byte() + this.g.byte() + this.b.byte() + this.a.byte();
+    }
+
+    /**
+     * Gets an array of the colors RGBA representation.
+     * @returns {number[]} An RGBA color in array form.
+     */
+    get rgba() {
+        return [this.r, this.g, this.b, this.a];
+    }
+
+    /**
+     * Gets a random color object.
+     * @returns {Color} A Color with random values.
+     */
+    static random = () => new this();
+
+    /**
+     * Gets a random 8 bit value
+     * @returns {number} A number from 0 - 255.
+     */
+    static randomValue = () => floor(Math.random() * (2 ** 8));
+
+    /**
+     * Tests if a color equals another color.
+     * @param {Color} col - The Color to check.
+     * @returns {boolean} If they're equal or not.
+     */
+    equals(col) {
+        if(this === col) return true;
+        return this.r == col.r && this.g == col.g && this.b == col.b && this.a == col.a;
+    }
+}
+
 /**
  * The default CellGrid `options` object.
  * @typedef {Object} CellGridOptions
- * @property {Color[]} tiles - Various colors representing various different states of cells - index 0 will always the background. Represents an array of RGBA colors. Defaults to `[new Color(0, 0, 0), new Color(255, 255, 255)]`.
- * @property {Color} bgOverride - The background override. Appears visually as its own color, but treated as `this.tiles[0]`.
- * @property {number} zoom - The scale of the simulation; a value of `1` matches your resolution. Default: `4` (I find it most appealing on my own resolution ;D).
- * @property {number} stepCooldown - How long it takes between mutations, in milliseconds. Default: `1`.
- * @property {boolean} enableAlpha - Should the canvas handle alpha values? Disabling this improves preformance. Default: `true`.
- * @property {boolean} enableContextMenu - Should we enable the context menu? Default: `false`.
+ * @property {?Color[]} tiles - Various colors representing various different states of cells - index 0 will always the background. Represents an array of RGBA colors. Defaults to `[new Color(0, 0, 0), new Color(255, 255, 255)]`.
+ * @property {?Color} bgOverride - The background override. Appears visually as its own color, but treated as `this.tiles[0]`.
+ * @property {?number} zoom - The scale of the simulation; a value of `1` matches your resolution. Default: `4` (I find it most appealing on my own resolution ;D).
+ * @property {?number} stepCooldown - How long it takes between mutations, in milliseconds. Default: `1`.
+ * @property {?boolean} enableAlpha - Should the canvas handle alpha values? Disabling this improves preformance. Default: `true`.
+ * @property {?boolean} enableContextMenu - Should we enable the context menu? Default: `false`.
+ * @property {?boolean} enableDrawing - Should we enable drawing? Default: `true`.
+ * @property {?number} mouseButtonDraw - The mouse button used to draw. Default: `0`.
+ * @property {?number} mouseButtonErase - The mouse button used to erase. Default: `2`.
  */
 
 /** The grid for cellular automation to play out. This is extended by LangtonsAnt, and can probably be extended elsewhere aswell! */
@@ -76,11 +149,53 @@ class CellGrid {
         this.stepCooldown = options.stepCooldown ?? 1;
         this.enableAlpha = options.enableAlpha ?? true;
         this.enableContextMenu = options.enableContextMenu ?? false;
+        this.enableDrawing = options.enableDrawing ?? true;
+        this.mouseButtonDraw = options.mouseButtonDraw ?? 0;
+        this.mouseButtonErase = options.mouseButtonErase ?? 2;
 
         this.canvas.setAttribute("width", (Math.round((this.canvas.clientWidth / window.devicePixelRatio) / this.zoom)));
         this.canvas.setAttribute("height", (Math.round((this.canvas.clientHeight / window.devicePixelRatio) / this.zoom)));
         this.width = this.canvas.width;
         this.height = this.canvas.height;
+
+        if(this.enableDrawing) {
+            this.canvas.addEventListener("mousedown", (ev) => {
+                if(ev.button == this.mouseButtonDraw) {
+                    this._drawing = true;
+                } else if(ev.button == this.mouseButtonErase) {
+                    this._erasing = true;
+                } else {
+                    return;
+                }
+                this._lastX = floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
+                this._lastY = floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+            });
+    
+            this.canvas.addEventListener("mouseup", (ev) => {
+                if(ev.button == this.mouseButtonDraw) {
+                    this._drawing = false;
+                } else if(ev.button == this.mouseButtonErase) {
+                    this._erasing = false;
+                } else {
+                    return;
+                }
+            });
+    
+            this.canvas.addEventListener("mousemove", (ev) => {
+                if(this._drawing || this._erasing) {
+                    let x1 = this._lastX ?? floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
+                    let y1 = this._lastY ?? floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+                    let x2 = floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
+                    let y2 = floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+                
+                    this.drawLine(x1, y1, x2, y2);
+                }
+            });
+        }
+
+        if(!this.enableContextMenu) {
+            this.canvas.addEventListener("contextmenu", (ev) => ev.preventDefault()); // Disables the context menu.
+        }
 
         this.init();
     }
@@ -95,12 +210,9 @@ class CellGrid {
             this.grid[i] = Array(this.width).fill(0);
         }
 
-        if(!this.enableContextMenu) {
-            this.canvas.addEventListener("contextmenu", (ev) => ev.preventDefault()); // Disables the context menu.
-        }
-
         this.ticks = 0;
-        this.goal = 0;
+        this.goal = Number.MAX_SAFE_INTEGER;
+        this.stopped = true;
 
         const color = this.bgOverride instanceof Color ? this.bgOverride : this.tiles[0];
         this.ctx.fillStyle = `rgba(${color.rgba})`;
@@ -114,7 +226,7 @@ class CellGrid {
      * @returns {Color} The color data from the grid.
      */
     getPixel(x, y) {
-        return new Color(this.ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data);
+        return new Color(this.ctx.getImageData(floor(x), floor(y), 1, 1).data);
     }
 
     /**
@@ -124,9 +236,7 @@ class CellGrid {
      * @param {Color} color - The color to set.
      */
     setPixel(x, y, color) {
-        if(!(color instanceof Color)) {
-            throw new Error("color must be a Color object.");
-        }
+        if(!(color instanceof Color)) throw new Error("color must be a Color object.");
 
         const img = this.ctx.createImageData(1, 1);
         img.data[0] = color.r; img.data[1] = color.g; img.data[2] = color.b; img.data[3] = color.a;
@@ -134,18 +244,68 @@ class CellGrid {
     }
 
     /**
+     * Draws a line between two points.
+     * @param {number} x1 
+     * @param {number} y1 
+     * @param {number} x2 
+     * @param {number} y2 
+     */
+     drawLine(x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
+        const incX = dx / steps;
+        const incY = dy / steps;
+
+        for(let i = 0; i < steps; i++) {
+            x1 += incX;
+            y1 += incY;
+            const x = floor(x1 < 0 ? 0 : x1);
+            const y = floor(y1 < 0 ? 0 : y1);
+
+            if(this._drawing) {
+                this.draw(x, y);
+            } else if(this._erasing) {
+                this.erase(x, y);
+            }
+        }
+    
+        this._lastX = x2;
+        this._lastY = y2;
+    }
+
+    /**
+     * What to do when we want to "draw" a pixel. Extend this in your own class!
+     * @param {number} x 
+     * @param {number} y 
+     */
+    draw(x, y) {
+        const tile = Math.min(this.grid[y][x] + 1, this.tiles.length - 1);
+        this.grid[y][x] = tile;
+        this.setPixel(x, y, this.tiles[tile]);
+    }
+
+    /**
+     * What to do when we want to "erase" a pixel. Extend this in your own class!
+     * @param {number} x 
+     * @param {number} y 
+     */
+    erase(x, y) {
+        this.grid[y][x] = 0;
+        this.setPixel(x, y, this.tiles[0]);
+    }
+
+    /**
      * Starts the simulation to run indefinitely.
      * You can set the `goal` property at any time to make it up until a point; by default, it runs to `Number.MAX_SAFE_INTEGER`.
      */
     start() {
-        this.stepTo(Number.MAX_SAFE_INTEGER);
-    }
-
-    /**
-     * Steps the simulation. Extend the CellGrid class and implement your own!
-     */
-    step() {
-        throw new Error("You need to extend the CellGrid class and create your own `step` function!");
+        if(!this.stopped) {
+            console.warn("Simulation already started; not starting again.");
+            return;
+        }
+        this.stopped = false;
+        requestAnimationFrame(this._step.bind(this))
     }
 
     /**
@@ -164,15 +324,30 @@ class CellGrid {
     }
 
     /**
-     * Steps to a certain tick.
-     * @param {number} to - The tick to step to.
+     * Sets up recursively looping steps.
+     * Not meant to be used by developers; use `this.start()` and `this.stop()`, and modify `this.goal` to wherever you want your simulation to stop.
      */
-    stepTo(to) {
-        if(this.stopped) {
-            this.stopped = false;
+    async _step() {
+        this.step();
+        if(typeof this.stepCooldown == "number" && this.stepCooldown >= 1) {
+            await sleep(this.stepCooldown);
         }
-        this.goal = to;
-        requestAnimationFrame(this.step.bind(this))
+
+        this.ticks++;
+        if(this.ticks >= this.goal) {
+            this.stop();
+        }
+
+        if(!this.stopped) {
+            requestAnimationFrame(this._step.bind(this))
+        }
+    }
+
+    /**
+     * Steps the simulation. Extend the CellGrid class and implement your own!
+     */
+     async step() {
+        throw new Error("You need to extend the CellGrid class and create your own `step` function!");
     }
 };
 
@@ -196,81 +371,41 @@ class LangtonsAnt extends CellGrid {
         super(canvas, options);
 
         this.ants = [];
-        this.rule = (options.rule ?? "RL").split("");
+        this.rule = (options.rule ?? "RL").toUpperCase().replace(/([^LR])/g, "").split("");
         if(this.rule.length > this.tiles.length) {
             // Fill in any missing tile colors with random ones.
             this.tiles = [...this.tiles, ...Array.from({ length: this.rule.length - this.tiles.length }, () => Color.random())]; // https://stackoverflow.com/a/64546606
         }
-        this.chaos = false; // >:D
+        this.chaos = false;
 
         this.canvas.addEventListener("click", (ev) => {
-            langton.spawnAnt(new Ant(Math.floor((ev.offsetX / window.devicePixelRatio) / this.zoom), Math.floor((ev.offsetY / window.devicePixelRatio) / this.zoom)))
-        });
-
-        /** ## Drawing Stuff */
-        this.canvas.addEventListener("mousedown", (ev) => {
-            if(ev.button !== 2) return;
-            this._painting = true;
-            this._lastX = Math.floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
-            this._lastY = Math.floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
-        });
-
-        this.canvas.addEventListener("mouseup", (ev) => {
-            if(ev.button !== 2) return;
-            this._painting = false;
-        });
-
-        this.canvas.addEventListener("mousemove", (ev) => {
-            if(this._painting) {
-                let x1 = this._lastX ?? Math.floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
-                let y1 = this._lastY ?? Math.floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
-                let x2 = Math.floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
-                let y2 = Math.floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
-            
-                let dx = x2 - x1;
-                let dy = y2 - y1;
-            
-                let steps;
-                if(Math.abs(dx) > Math.abs(dy)) {
-                    steps = Math.abs(dx);
-                } else {
-                    steps = Math.abs(dy);
-                }
-            
-                let incX = dx / steps;
-                let incY = dy / steps;
-                let x = x1;
-                let y = y1;
-            
-                for(let i = 0; i < steps; i++) {
-                    x = x + incX;
-                    y = y + incY;
-                    let _x = Math.floor(x < 0 ? 0 : x);
-                    let _y = Math.floor(y < 0 ? 0 : y);
-                
-                    if(this.chaos) {
-                        this.spawnAnt(new Ant(_x, _y));
-                    } else {
-                        const tile = Math.min(this.grid[_y][_x] + 1, this.tiles.length - 1);
-                        this.grid[_y][_x] = tile;
-                        this.setPixel(_x, _y, this.tiles[tile]);
-                    }
-                }
-            
-                this._lastX = x2;
-                this._lastY = y2;
-            }
+            langton.spawnAnt(new Ant(floor((ev.offsetX / window.devicePixelRatio) / this.zoom), floor((ev.offsetY / window.devicePixelRatio) / this.zoom)));
         });
     }
 
     /**
      * Spawns a single ant.
-     * @param {Ant} ant - he
+     * @param {Ant} ant - The ant to spawn.
      */
     spawnAnt(ant) {
         if(!ant instanceof Ant) throw new Error("`ant` must be of the Ant class.");
         this.ants.push(ant);
         if(langton.stopped) langton.start();
+    }
+
+    /**
+     * LangtonsAnt's drawing function.
+     * @param {number} x
+     * @param {number} y
+     */
+    draw(x, y) {
+        if(this.chaos) { // >:)
+            this.spawnAnt(new Ant(x, y));
+        } else {
+            const tile = Math.min(this.grid[y][x] + 1, this.tiles.length - 1);
+            this.grid[y][x] = tile;
+            this.setPixel(x, y, this.tiles[tile]);
+        }
     }
 
     /**
@@ -282,8 +417,8 @@ class LangtonsAnt extends CellGrid {
      */
     spawnPack(x, y, length, numants) {
         for(let i = 0; i < numants; i++) {
-            const _x = Math.floor(Math.random() * (x - (x - length) + 1)) + (x - length);
-            const _y = Math.floor(Math.random() * (y - (y - length) + 1)) + (y - length);
+            const _x = floor(Math.random() * (x - (x - length) + 1)) + (x - length);
+            const _y = floor(Math.random() * (y - (y - length) + 1)) + (y - length);
             this.spawnAnt(new Ant(_x, _y));
         }
     }
@@ -320,14 +455,7 @@ class LangtonsAnt extends CellGrid {
             // Now, draw the ant on its new pixel.
             this.setPixel(ant.x, ant.y, ant.color);
         }
-        this.ticks++;
-
         if(this.ants.length < 1) this.stop();
-        if(typeof this.stepCooldown == "number" && this.stepCooldown >= 1) await sleep(this.stepCooldown);
-
-        if(!this.stopped || (this.ticks >= this.goal)) {
-            requestAnimationFrame(this.step.bind(this));
-        }
     }
 
     /**
@@ -340,8 +468,6 @@ class LangtonsAnt extends CellGrid {
         }
         this.start();
     }
-
-
 }
 
 /** Our representation of an ant. */
@@ -370,71 +496,86 @@ class Ant {
     }
 }
 
-/** A class representing a 32 bit RGBA color. */
-class Color {
+/** An implementation of Conway's Game of Life. */
+class GameOfLife extends CellGrid {
     /**
-     * Constructs a color from given RGBA values.
-     * - Values, if not provided, default to random values clamped between 0 to 255. 
-     * - Alpha, if not provided, defaults to an opaque 255.
-     * @param {number|number[]} r - The red value. Alternatively, if an array is passed in, the color values are taken from this array and g, b, and a are ignored.
-     * @param {number} g - The green value.
-     * @param {number} b - The blue value.
-     * @param {number} a - The alpha value.
+     * Constructs the Game of Life.
+     * @param {HTMLElement} canvas 
+     * @param {CellGridOptions} options 
      */
-    constructor(r, g, b, a = 255) {
-        if(Array.isArray(r)) {
-            this.r = Math.abs(r[0] ?? Color.randomValue()) % 256 | 0;
-            this.g = Math.abs(r[1] ?? Color.randomValue()) % 256 | 0;
-            this.b = Math.abs(r[2] ?? Color.randomValue()) % 256 | 0;
-            this.a = Math.abs(r[3] ?? Color.randomValue()) % 256 | 0;
-        } else {
-            this.r = Math.abs(r ?? Color.randomValue()) % 256 | 0;
-            this.g = Math.abs(g ?? Color.randomValue()) % 256 | 0;
-            this.b = Math.abs(b ?? Color.randomValue()) % 256 | 0;
-            this.a = Math.abs(a ?? Color.randomValue()) % 256 | 0;
+    constructor(canvas, options = {}) {
+        super(canvas, options);
+        if(this.tiles.length > 2) {
+            console.warn("`tiles` has a length larger than two; using only the first two tiles.")
         }
+
+        this.canvas.addEventListener("click", (ev) => {
+            const x = floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
+            const y = floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+            if(ev.button === this.mouseButtonErase) {
+                this.erase(x, y);
+            } else {
+                this.draw(x, y);
+            }
+        });
+    }
+
+    /** See CellGrid.draw() */
+    draw(x, y) {
+        this.grid[y][x] = 1;
+        this.setPixel(x, y, this.tiles[1]);
     }
 
     /**
-     * Gets a string of the colors hexadecimal representation.
-     * @returns {string} A colors hexadecimal representation.
+     * Returns the amount of neighbors around the given coordinates.
+     * @param {number} y - Y coordinate.
+     * @param {number} x - X coordinate.
+     * @returns {number}
      */
-    get hex() {
-        return this.r.byte() + this.g.byte() + this.b.byte() + this.a.byte();
+    getNeighbors(y, x) {
+        let neighbors = 0; // The amount of alive neighbors around `this.grid[i][j]`.
+        /* LEFT         */ if(x - 1 > -1) neighbors += this.grid[y][x - 1];
+        /* TOP LEFT     */ if((x - 1 > -1) && (y - 1 > -1)) neighbors += this.grid[y - 1][x - 1];
+        /* TOP          */ if(y - 1 > -1) neighbors += this.grid[y - 1][x];
+        /* TOP RIGHT    */ if((y - 1 > -1) && (x + 1 < this.grid[y].length)) neighbors += this.grid[y - 1][x + 1];
+        /* RIGHT        */ if(x + 1 < this.grid[y].length) neighbors += this.grid[y][x + 1];
+        /* BOTTOM RIGHT */ if((x + 1 < this.grid[y].length) && (y + 1 < this.grid.length)) neighbors += this.grid[y + 1][x + 1];
+        /* BOTTOM       */ if(y + 1 < this.grid.length) neighbors += this.grid[y + 1][x];
+        /* BOTTOM LEFT  */ if((y + 1 < this.grid.length) && (x - 1 > -1)) neighbors += this.grid[y + 1][x - 1];
+        return neighbors;
     }
 
     /**
-     * Gets an array of the colors RGBA representation.
-     * @returns {number[]} An RGBA color in array form.
+     * Steps the game of life.
      */
-    get rgba() {
-        return [this.r, this.g, this.b, this.a];
-    }
+    step() {
+        const back = [];
+        for(let i = 0; i < this.grid.length; i++) {
+            back.push([]);
+            for(let j = 0; j < this.grid[i].length; j++) {
+                let neighbors = this.getNeighbors(i, j);
 
-    /**
-     * Gets a random color object.
-     * @returns {Color} A Color with random values.
-     */
-    static random = () => new this();
+                if(this.grid[i][j] == 0) {
+                    // If the cell is dead, and has exactly three neighbors, it becomes alive.
+                    if(neighbors == 3) {
+                        back[i][j] = 1;
+                    } else {
+                        back[i][j] = 0;
+                    }
+                } else {
+                    // If the cell is alive and has less than two neighbors or greater than 3 neighbors, it dies.
+                    if(neighbors == 2 || neighbors == 3) {
+                        back[i][j] = 1;
+                    } else {
+                        back[i][j] = 0;
+                    }
+                }
 
-    /**
-     * Gets a random 8 bit value
-     * @returns {number} A number from 0 - 255.
-     */
-    static randomValue() {
-        return Math.floor(Math.random() * (2 ** 8));
-    }
-
-    /**
-     * Tests if a color equals another color.
-     * @param {Color} col - The Color to check.
-     * @returns {boolean} If they're equal or not.
-     */
-    equals(col) {
-        if(this === col) {
-            return true;
-        } else {
-            return this.r === col.r && this.g === col.g && this.b === col.b && this.a === col.a;
+                if(back[i][j] != this.grid[i][j]) {
+                    this.setPixel(j, i, this.tiles[back[i][j]]);
+                }
+            }
         }
+        this.grid = back;
     }
 }

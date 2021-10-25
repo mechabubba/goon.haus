@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <title>cells.js - The Game of Life</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/shared.css">
+        <link rel="stylesheet" href="/cells/shared.css">
+        <style>
+            :root {
+                --accent-color: rgba(91, 255, 219);
+            }
+            .trans {
+                opacity: 0.5;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="info">
+            <span class="title"># life.html</span><br>
+            An implementation of <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Conway's Game of Life</a> using <a href="./cells.js">cells.js</a>.<br>
+            Drag left click to draw, right click to erase.<br>
+            Using <a href="http://www.famfamfam.com/lab/icons/silk/">silk icons</a> by Mark James. Also see <a href="./">the original page</a>!
+        </div>
+        <canvas id="cells"></canvas>
+        <div class="toolbar">
+            <div id="pause"><img src="/assets/silkicons/clock.png"></div>
+        </div>
+        <script src="cells.js"></script>
+        <script>
+            const canvas = document.getElementById("cells");
+            const tiles = [new Color(0, 0, 0), new Color(255, 255, 255)];
+
+            const life = new GameOfLife(canvas, {
+                zoom: 8,
+                tiles: tiles,
+                stepCooldown: 60,
+                mouseButtonDraw: 0,
+                mouseButtonErase: 2,
+            });
+
+            const pause = document.getElementById("pause");
+            pause.addEventListener("click", () => {
+                if(life.stopped) {
+                    life.start();
+                } else {
+                    life.stop();
+                }
+            })
+
+            life.start();
+        </script>
+    </body>
+</html>
