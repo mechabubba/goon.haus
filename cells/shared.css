@@ -41,6 +41,7 @@ select:hover, select:active { text-decoration: underline; }
 #cells {
     position: absolute;
     image-rendering: pixelated;
+    touch-action: none;
     height: 100vh;
     width: 100vw;
     z-index: 0;

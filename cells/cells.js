@@ -158,39 +158,62 @@ class CellGrid {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
 
-        if(this.enableDrawing) {
-            this.canvas.addEventListener("mousedown", (ev) => {
-                if(ev.button == this.mouseButtonDraw) {
+        // CellGrid.events - used for mobile support. @todo kinda scuffed
+        this.events = {
+            "mousedown": (ev, isTouch = false) => {
+                if(ev.button == this.mouseButtonDraw || isTouch) {
                     this._drawing = true;
                 } else if(ev.button == this.mouseButtonErase) {
                     this._erasing = true;
                 } else {
                     return;
                 }
-                this._lastX = floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
-                this._lastY = floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
-            });
-    
-            this.canvas.addEventListener("mouseup", (ev) => {
-                if(ev.button == this.mouseButtonDraw) {
+
+                if(isTouch) {
+                    let touch = ev.changedTouches[0];
+                    this._lastX = floor((touch.clientX / window.devicePixelRatio) / this.zoom);
+                    this._lastY = floor((touch.clientY / window.devicePixelRatio) / this.zoom);
+                } else {
+                    this._lastX = floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
+                    this._lastY = floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+                }
+            },
+            "mouseup": (ev, isTouch = false) => {
+                if(ev.button == this.mouseButtonDraw || isTouch) {
                     this._drawing = false;
                 } else if(ev.button == this.mouseButtonErase) {
                     this._erasing = false;
                 } else {
                     return;
                 }
-            });
-    
-            this.canvas.addEventListener("mousemove", (ev) => {
+            },
+            "mousemove": (ev, isTouch = false) => {
                 if(this._drawing || this._erasing) {
-                    let x1 = this._lastX ?? floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
-                    let y1 = this._lastY ?? floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
-                    let x2 = floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
-                    let y2 = floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+                    //let x1 = this._lastX ?? floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
+                    //let y1 = this._lastY ?? floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+                    let x2, y2;
+                    if(isTouch) {
+                        let touch = ev.changedTouches[0];
+                        x2 = floor((touch.clientX / window.devicePixelRatio) / this.zoom);
+                        y2 = floor((touch.clientY / window.devicePixelRatio) / this.zoom);
+                    } else {
+                        x2 = floor((ev.offsetX / window.devicePixelRatio) / this.zoom);
+                        y2 = floor((ev.offsetY / window.devicePixelRatio) / this.zoom);
+                    }
                 
-                    this.drawLine(x1, y1, x2, y2);
+                    this.drawLine(this._lastX, this._lastY, x2, y2);
                 }
-            });
+            }
+        }
+
+        if(this.enableDrawing) {
+            this.canvas.addEventListener("mousedown", (ev) => this.events.mousedown(ev));
+            this.canvas.addEventListener("mouseup", (ev) => this.events.mouseup(ev));
+            this.canvas.addEventListener("mousemove", (ev) => this.events.mousemove(ev));
+
+            this.canvas.addEventListener("touchstart", (ev) => this.events.mousedown(ev, true));
+            this.canvas.addEventListener("touchend", (ev) => this.events.mouseup(ev, true))
+            this.canvas.addEventListener("touchmove", (ev) => this.events.mousemove(ev, true));
         }
 
         if(!this.enableContextMenu) {

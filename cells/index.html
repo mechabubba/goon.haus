@@ -37,6 +37,7 @@
         <script>
             const canvas = document.getElementById("cells");
             const select = document.getElementById("rules");
+            const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
             function gradient(col1, col2, length) {
                 if(!(col1 instanceof Color) || !(col2 instanceof Color)) {
@@ -59,6 +60,7 @@
             const langton = new LangtonsAnt(canvas, {
                 alpha: true,
                 rule: select.value,
+                zoom: mobile ? 2 : 4,
                 tiles: gradient(new Color(0, 0, 0), new Color(255, 255, 255), select.value.length),
                 mouseButtonDraw: 2,
             });
