@@ -411,7 +411,7 @@ class LangtonsAnt extends CellGrid {
      * @param {Ant} ant - The ant to spawn.
      */
     spawnAnt(ant) {
-        if(!ant instanceof Ant) throw new Error("`ant` must be of the Ant class.");
+        if(!(ant instanceof Ant)) throw new Error("`ant` must be of the Ant class.");
         this.ants.push(ant);
         if(langton.stopped) langton.start();
     }
