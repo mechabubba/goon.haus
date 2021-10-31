@@ -52,7 +52,7 @@
                     let g = Math.floor(col1.g * (1 - p) + col2.g * p);
                     let b = Math.floor(col1.b * (1 - p) + col2.b * p);
                     let a = Math.floor(col1.a * (1 - p) + col2.a * p);
-                    colors.push(new Color(r, g, b, a));
+                    colors.push(new RGBAColor(r, g, b, a));
                 }
                 return colors;
             }
@@ -61,7 +61,7 @@
                 alpha: true,
                 rule: select.value,
                 zoom: mobile ? 2 : 4,
-                tiles: gradient(new Color(0, 0, 0), new Color(255, 255, 255), select.value.length),
+                tiles: gradient(new RGBAColor(0, 0, 0), new RGBAColor(255, 255, 255), select.value.length),
                 mouseButtonDraw: 2,
             });
             const cx = Math.floor(canvas.width / 2);
@@ -77,7 +77,7 @@
                 langton.stop();
                 langton.ants = [new Ant(cx, cy)];
                 langton.rule = rule;
-                langton.tiles = gradient(new Color(0, 0, 0), new Color(255, 255, 255), rule.length);
+                langton.tiles = gradient(new RGBAColor(0, 0, 0), new RGBAColor(255, 255, 255), rule.length);
                 langton.reset();
             }
 

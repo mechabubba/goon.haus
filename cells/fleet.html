@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/shared.css">
+        <link rel="stylesheet" href="/cells/shared.css">
+        <style>
+            #cells {
+                height: 100vh;
+                width: 100vw;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="cells"></canvas>
+        <script src="cells.js"></script>
+        <script>
+            // Lifeform example. :)
+            const cells = document.getElementById("cells");
+            const tiles = [new RGBAColor(0, 0, 0), new RGBAColor(255, 255, 255)];
+            const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            const life = new GameOfLife(cells, {
+                zoom: mobile ? 2 : 8,
+                tiles: tiles,
+                stepCooldown: 60,
+                mouseButtonDraw: 0,
+                mouseButtonErase: 2,
+            });
+
+            const glider = new Lifeform([
+                [0, 1, 0],
+                [0, 0, 1],
+                [1, 1, 1],
+            ]);
+
+            let nextX = 0;
+            let nextY = 0;
+            const margin = 10; // should be a number that supports an even grid of gliders on screen
+            while(nextY < life.height - glider.height) {
+                nextX = 0;
+                while(nextX < life.width - glider.width) {
+                    life.spawnLifeform(nextX, nextY, glider);
+                    nextX += margin;
+                }
+                nextY += margin;
+            }
+
+            life.start();
+        </script>
+    </body>
+</html>

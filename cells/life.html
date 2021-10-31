@@ -25,7 +25,7 @@
         <script src="cells.js"></script>
         <script>
             const canvas = document.getElementById("cells");
-            const tiles = [new Color(0, 0, 0), new Color(255, 255, 255)];
+            const tiles = [new RGBAColor(0, 0, 0), new RGBAColor(255, 255, 255)];
             const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
             const life = new GameOfLife(canvas, {
@@ -38,12 +38,27 @@
 
             const pause = document.getElementById("pause");
             pause.addEventListener("click", () => {
-                if(life.stopped) {
-                    life.start();
-                } else {
-                    life.stop();
-                }
+                life.stopped ? life.start() : life.stop();
             })
+
+            const glider = new Lifeform([
+                [0, 1, 0],
+                [0, 0, 1],
+                [1, 1, 1],
+            ]);
+
+            let nextX = 0;
+            let nextY = 0;
+            let marginX = 10; // should be a number that supports an even grid of gliders on screen
+            let marginY = 10;
+            while(nextY < life.height - glider.height) {
+                nextX = 0;
+                while(nextX < life.width - glider.width) {
+                    life.spawnLifeform(nextX, nextY, glider);
+                    nextX += marginX;
+                }
+                nextY += marginY;
+            }
 
             life.start();
         </script>
