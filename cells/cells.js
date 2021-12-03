@@ -105,7 +105,7 @@ class HSLAColor extends Color {
             this.a = abs(a ?? this._randomValue() / 255);
         }
     }
-    css() { return `hsla(${[this.h, this.s, this.l, this.a]})`; }
+    css() { return `hsla(${[this.h, `${this.s * 100}%`, `${this.l * 100}%`, this.a]})`; }
     toRGBA() {
         let r, g, b;
         if(this.s == 0) {
@@ -400,8 +400,8 @@ class LangtonsAnt extends CellGrid {
     /** Spawns a number of ants within a length x length square at (x, y). */
     spawnPack(x, y, length, numants) {
         for(let i = 0; i < numants; i++) {
-            const _x = floor(Math.random() * (x - (x - length) + 1)) + (x - length);
-            const _y = floor(Math.random() * (y - (y - length) + 1)) + (y - length);
+            const _x = floor(random() * (x - (x - length) + 1)) + (x - length);
+            const _y = floor(random() * (y - (y - length) + 1)) + (y - length);
             this.spawnAnt(new Ant(_x, _y));
         }
     }
