@@ -39,7 +39,7 @@ class Matrix {
     constructor(height, width, fill = 0) {
         this.height = height; // X
         this.width = width;   // Y
-        this.init(0);
+        this.init(fill);
     }
     init = (fill = 0) => this.matrix = Array.from({ length: this.height }, (v, i) => Array.from({ length: this.width }, (v, i) => fill));
     get = (x, y) => this.matrix[mod(y, this.height)][mod(x, this.width)];
