@@ -106,7 +106,7 @@ class HSLAColor extends Color {
         }
     }
     css() { return `hsla(${[this.h, `${this.s * 100}%`, `${this.l * 100}%`, this.a]})`; }
-    toRGBA() {
+    toRGBA() { // Source: https://stackoverflow.com/a/9493060/17188891
         let r, g, b;
         if(this.s == 0) {
             r = g = b = l; // achromatic
@@ -246,6 +246,8 @@ class CellGrid {
 
     /**
      * Gets a color from a pixel on the canvas.
+     * 
+     * **Note that this is a pretty resource-intensive function and should only be used in individual circumstances.**
      * @param {number} x - X coordinate.
      * @param {number} y - Y coordinate.
      * @returns {Color} The color data from the grid.
@@ -414,7 +416,7 @@ class LangtonsAnt extends CellGrid {
             // First, draw the ants previous tile.
             const tile = (ant.tile + 1) % this.tiles.length;
             this.matrix.set(ant.x, ant.y, tile);
-            this.setPixel(ant.x, ant.y, this.tiles[tile]);
+            this.setPixel(mod(ant.x, this.width), mod(ant.y, this.height), this.tiles[tile]);
 
             // We get the rotation from the current tiles rule.
             // @todo may want to add more rules like "F" and "B"
@@ -433,7 +435,7 @@ class LangtonsAnt extends CellGrid {
             ant.tile = this.matrix.get(ant.x, ant.y);
 
             // Now, draw the ant on its new pixel.
-            this.setPixel(ant.x, ant.y, ant.color);
+            this.setPixel(mod(ant.x, this.width), mod(ant.y, this.height), ant.color);
         }
         if(this.ants.length < 1) this.stop();
     }
@@ -513,15 +515,6 @@ class GameOfLife extends CellGrid {
      */
     getNeighbors(y, x) {
         let neighbors = 0; // The amount of alive neighbors around `this.grid[i][j]`.
-        // /* LEFT         */ if(x - 1 > -1) neighbors += this.grid.get(x - 1, y);
-        // /* TOP LEFT     */ if((x - 1 > -1) && (y - 1 > -1)) neighbors += this.grid.get(x - 1, y - 1);
-        // /* TOP          */ if(y - 1 > -1) neighbors += this.grid.get(x, y - 1);
-        // /* TOP RIGHT    */ if((y - 1 > -1) && (x + 1 < this.grid[y].length)) neighbors += this.grid.get(x + 1, y - 1);
-        // /* RIGHT        */ if(x + 1 < this.grid[y].length) neighbors += this.grid.get(x + 1, y);
-        // /* BOTTOM RIGHT */ if((x + 1 < this.grid[y].length) && (y + 1 < this.grid.length)) neighbors += this.grid.get(x + 1, y + 1);
-        // /* BOTTOM       */ if(y + 1 < this.grid.length) neighbors += this.grid.get(x, y + 1);
-        // /* BOTTOM LEFT  */ if((y + 1 < this.grid.length) && (x - 1 > -1)) neighbors += this.grid.get(x - 1, y + 1);
-        
         /* LEFT         */ neighbors += this.matrix.get(x - 1, y);
         /* TOP LEFT     */ neighbors += this.matrix.get(x - 1, y - 1);
         /* TOP          */ neighbors += this.matrix.get(x, y - 1);
