@@ -1,12 +1,10 @@
+/* this document just contains some normalization stuff + fonts */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@400&display=swap');
 
 * { box-sizing: border-box; }
 
-html, body {
-    margin: 0;
-    padding: 0;
-}
+[hidden] { display: none !important; }
 
 body {
     height: 100vh;
@@ -15,6 +13,8 @@ body {
     font-family: 'Roboto', sans-serif;
     line-height: 1.2;
 }
+
+html, body { margin: 0; padding: 0; }
 
 a {
     color: rgb(102, 156, 255);
@@ -29,34 +29,3 @@ a:hover, a:focus, a:active {
 }
 
 h1, h2, h3, h4, h5, h6 { margin: 16px 0; }
-
-[hidden] { display: none !important; }
-
-code { display: inline; padding: 2px 4px; font-family: 'Roboto Mono', monospace; line-height: 1.1; font-size: 15px; color: #cccccc; background-color: rgba(0, 0, 0, 0.5); border-radius: 5px; white-space: nowrap }
-
-/* COLORS */
-.c_r { color: #ff7777 }
-.c_y { color: #fdff7a }
-.c_g { color: #96ff70 }
-.c_b { color: #6bdcff }
-.c_bl { color: #7289DA }
-.c_rgb { color: #ff7777; animation: rainbow_cycle 3.5s infinite linear; transition: .3s; }
-@keyframes rainbow_cycle {
-    11%  { color: #ff7777; }
-    22%  { color: #ffc37e; }
-    33%  { color: #fdff7a; }
-    44%  { color: #96ff70; }
-    55%  { color: #6bdcff; }
-    66%  { color: #6070ff; }
-    77%  { color: #aa75ff; }
-    88%  { color: #ff78e2; }
-    100% { color: #ff7777; }
-}
-.c_semitrans { opacity: 0.5; }
-.c_supertrans { opacity: 0.25; }
-
-.underline { text-decoration: underline; }
-.bold { font-weight: bold; }
-.italics { font-style: italic; }
-.t_center { text-align: center; }
-.mono { font-family: 'Roboto Mono', monospace; }

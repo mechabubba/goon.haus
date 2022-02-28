@@ -1,11 +1,11 @@
 <!doctype html>
 <html>
     <head>
-        <title>mechabubba's homepage</title>
+        <title>steve's homepage</title>
         <link rel="icon" type="image/png" href="/assets/favicon.png">
         <link rel="stylesheet" href="shared.css">
         <meta charset="utf-8">
-        <meta property="og:title" itemprop="name" content="mechabubba's homepage">
+        <meta property="og:title" itemprop="name" content="steve's homepage">
         <meta property="og:type" content="website">
         <meta property="og:image" content="https://goon.haus/assets/avatar.png">
         <meta property="og:image:width" content='100'>
@@ -15,83 +15,90 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             :root {
-                --bg-color: rgb(24, 24, 24);
-                --text-color: rgba(238, 238, 238);
-                --header-bg: linear-gradient(90deg, hsl(239, 100%, 70%) 0%, hsl(0, 100%, 70%) 50%, hsl(32, 100%, 70%) 100%);
-                --header-bg-avatar: hsl(239, 100%, 70%);
+                --bg-color: rgb(0, 0, 0);
+                --text-color: rgb(238, 238, 238);
+                --title-gradient: linear-gradient(90deg, hsl(239, 100%, 70%) 0%, hsl(0, 100%, 70%) 50%, hsl(32, 100%, 70%) 100%);
             }
+
             html {
-                background-image: url("assets/tile.png"); /* this'll eventually be something cooler... */
+                /* background-image: url("assets/tile.png"); this'll eventually be something cooler... */
                 background-color: var(--bg-color);
                 color: var(--text-color);
             }
+            
             body {
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
 
-            #info {
-                position: relative;
-                padding: 0 16px;
-                margin: 16px 0;
-                width: 20%;
-                min-width: 325px;
-                background: rgba(0, 0, 0, 0.6);
-                border: 2px solid rgba(255, 255, 255, 0.5);
-                border-radius: 16px;
+            #wrapper {
+                display: grid;
+                grid-template-columns: minmax(auto, 400px) minmax(auto, 400px);
+                grid-template-areas:
+                    "header header"
+                    "about projects"
+                    "footer footer";
+                gap: 16px;
+                margin: 0 32px;
             }
+
+            @media only screen and (max-width: 640px) {
+                #wrapper { display: block; }
+            }
+
             .avatar {
-                height: 40px;
-                width: 40px;
-                margin: 0 12px 0 0;
-                background: var(--header-bg-avatar);
+                height: 128px;
+                width: 128px;
+                /* background: hsl(0, 100%, 70%); */
                 border-radius: 50%;
-                vertical-align: middle;
             }
-            .header {
-                background: var(--header-bg);
+
+            #header { grid-area: header; }
+            #about { grid-area: about; }
+            #projects { grid-area: projects; }
+            #footer { grid-area: footer; }
+
+            #header > h1 { margin-bottom: 0; }
+            .title {
+                background: var(--title-gradient);
                 background-clip: text;
                 -webkit-background-clip: text;
                 color: transparent;
-                vertical-align: middle;
             }
-            .footer {
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                font-size: 12px;
-                opacity: 0.5;
-                margin: 8px;
+
+            #header, #footer {
+                text-align: center;
             }
-            .footer > span { float: right; }
+
+            li {
+                margin-bottom: 4px;
+            }
         </style>
     </head>
     <body>
-        <div id="info">
-            <div>
-                <h1>
-                    <img class="avatar" src="assets/avatar.png"><span class="header">hey, i'm steve</span> 🌊
-                </h1>
-                <p>
-                    <p>Welcome to my small space on the internet! I'm a student studying computer science. In my free time I like to ride my bike, develop software, and play Team Fortress 2.</p>
-                    <p>On most sites, you can find me going by either mechabubba or Steven.</p>
-                    <p>You may be looking for...</p>
-                    <ul>
-                        <li>Information about <a href="/bear/">bear,</a> my Discord bot</li>
-                        <li><a href="https://func.zone">func.zone</a></li>
-                        <li><a href="/cells/">cells.js</a></li>
-                    </ul>
-                </p>
-                <p>
-                    Follow me elsewhere;<br>
-                    <a href="https://github.com/mechabubba">Github</a> | <a href="http://steamcommunity.com/profiles/76561198058209703">Steam</a>
-                </p>
-                <!--
-                <div class="footer">
-                    <span class="italics">hello</span><br>
-                </div>
-                -->
+        <div id="wrapper">
+            <div id="header">
+                <img class="avatar" src="assets/avatar.png">
+                <h1><span class="title">hey, i'm steve</span> 🌊</h1>
+            </div>
+            <div id="about">
+                <h1>About Me</h1>
+                <p>Welcome to my small space on the internet! My name is Steven, but I go by mechabubba in many places elsewhere.</p>
+                <p>I am a student studying Computer Science at the University of Iowa, a software developer, and a full stack enthusiast. I enjoy learning new things and applying what I learn inside of my projects and work. I am also a proud Linux user.</p>
+                <p>Outside of my degree, I am a competitive TF2 enthusiast and often spend my time biking outside.</p>
+            </div>
+            <div id="projects">
+                <h1>Projects</h1>
+                <ul>
+                    <li><a href="/bear/">bear</a> - My general use Discord bot.</li>
+                    <li><a href="/cells/">cells.js</a> - an experiment in cellular automation, inside of the HTML canvas. Implements Langton's Ant (and various other interesting "rules"), as well as Conway's Game of Life.</li>
+                    <li><a href="https://github.com/mechabubba/bomo">bomo</a> - A (work in progress) open source take on the classic Mattel card game UNO, playable via web browser.</li>
+                    <li>...and much more! I encourage you to check out my GitHub account if you're curious.</li>
+                </ul>
+            </div>
+            <div id="footer">
+                <a href="https://github.com/mechabubba">GitHub</a> | <a href="http://steamcommunity.com/profiles/76561198058209703">Steam</a>
             </div>
         </div>
     </body>

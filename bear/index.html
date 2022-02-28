@@ -14,15 +14,22 @@
         <meta name="theme-color" content="#DEDEDE">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            html { background-color: #212121; }
-            body, .wrapper {
-                color: white;
+            :root {
+                --bg-color: rgb(33, 33, 33);
+                --text-color: rgb(238, 238, 238);
+            }
+
+            html { background-color: var(--bg-color); }
+
+            body {
+                color: var(--text-color);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 flex-direction: column;
             }
-            .wrapper > * { max-width: 275px; }
+            body > * { max-width: 275px; }
+
             .title {
                 font-weight: 800;
                 margin-bottom: 4px;
@@ -39,22 +46,40 @@
                 0% { background-position: 0 0; }
                 100% { background-position: 200% 0; }
             }
-            .subtitle {
-                font-style: italic;
-                color: #AAAAAA;
-                margin: 0;
+
+            #header {
+                text-align: center;
             }
-            .about {
+
+            .rgb { color: #ff7777; animation: rgb 3.5s infinite linear; transition: .3s; }
+            .rgb:hover, .rgb:focus, .rgb:active { color: inherit; }
+            @keyframes rgb {
+                11%  { color: #ff7777; }
+                22%  { color: #ffc37e; }
+                33%  { color: #fdff7a; }
+                44%  { color: #96ff70; }
+                55%  { color: #6bdcff; }
+                66%  { color: #6070ff; }
+                77%  { color: #aa75ff; }
+                88%  { color: #ff78e2; }
+                100% { color: #ff7777; }
+            }
+
+            #about {
                 text-align: center;
                 background-color: rgba(0, 0, 0, 0.5);
                 border-radius: 16px;
                 padding: 0 16px
             }
-            .footer {
+
+            #footer {
+                text-align: center;
                 margin: 4px;
                 font-size: 10px;
                 opacity: 25%;
+                font-style: italic;
             }
+
             p { margin: 16px 0 }
             hr {
                 height: 1px;
@@ -66,21 +91,19 @@
         </style>
     </head>
     <body>
-        <div class="wrapper">
+        <div id="header">
             <img src="/assets/bear/bear.gif" title="hey pal" alt="bear.gif">
-            <div class="t_center">
-                <h1 class="title grad">bear</h1>
-                <p class="subtitle">"the greatest bot"</p>
-                <p><a href="https://discordapp.com/oauth2/authorize?&client_id=435224030459723776&scope=bot&permissions=8" class="c_rgb">Invite</a> | <a href="https://github.com/mechabubba/bear">Source</a></p>
-            </div>
-            <div class="about">
-                <p>This is a Discord bot created by <span class="c_bl">@stev#7503.</span> Since its creation in 2017, it's slowly grown and become more and more complicated and feature-ful.</p>
-                <hr>
-                <p>Right now, it's written in Node.js using <a href="https://github.com/06000208/sandplate">sandplate,</a> a powerful bot framework.</p>
-            </div>
-            <div class="footer">
-                <span class="italics">The bear itself is from <a href="https://www.bear-tracker.com/">bear-tracker.com</a> - since 2002!</span>
-            </div>
+            <h1 class="title">bear</h1>
+            <span style="font-style: italic; color: rgb(170, 170, 170)">"the greatest bot"</span>
+            <p><a href="https://discordapp.com/oauth2/authorize?&client_id=435224030459723776&scope=bot&permissions=8" class="rgb">Invite</a> | <a href="https://github.com/mechabubba/bear">Source</a></p>
+        </div>
+        <div id="about">
+            <p>This is a Discord bot created by mechabubba, aka <span style="color: rgb(114, 137, 218)">@steven#6969</span>. Since its creation in around 2017, it's slowly but surely grown and become more and more feature complete.</p>
+            <hr>
+            <p>Right now, it's written in Node.js as a fork of <a href="https://github.com/06000208/sandplate">sandplate,</a> a powerful bot framework.</p>
+        </div>
+        <div id="footer">
+            The bear itself is from <a href="https://www.bear-tracker.com/">bear-tracker.com</a> - on the 'net since 2002!
         </div>
     </body>
 </html>
