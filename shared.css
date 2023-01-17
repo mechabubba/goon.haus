@@ -17,7 +17,7 @@ body {
 html, body { margin: 0; padding: 0; }
 
 a {
-    color: rgb(102, 156, 255);
+    color: hsl(240, 100%, 75%);
     border: solid 1px transparent;
     text-decoration: none;
     transition: 0.2s;

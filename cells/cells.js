@@ -27,7 +27,16 @@ Number.prototype.byte = () => Math.abs(this % 256).toString(16).padStart(2, "0")
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** The modulus operation, but negative numbers `v` wrap around to `l - v`. Source: https://stackoverflow.com/a/43827557/17188891 */
-const mod = (v, l) => ((v % l) + l) % l;
+/**
+ * Modulus operation implemented without the modulus operator. Also wraps negative number `v` around to `l - v`. Source: 
+ * @param {*} v 
+ * @param {*} l 
+ * @returns 
+ */
+const mod = (v, l) => {
+    //return ((v % l) + l) % l;
+    return v - (l * Math.floor(v / l));
+}
 
 // Shorthand for some functions.
 const abs = Math.abs;
@@ -70,7 +79,7 @@ class RGBAColor extends Color {
         }
     }
     hex = () => this.r.byte() + this.g.byte() + this.b.byte() + this.a.byte();
-    css() { return `rgba(${[this.r, this.g, this.b, this.a]})`; }
+    css() { return `rgba(${[this.r, this.g, this.b, (this.a / 255)]})`; }
     toHSLA = () => { // Source: https://stackoverflow.com/a/9493060/17188891
         let r = this.r / 255, g = this.g / 255, b = this.b / 255, a = this.a / 255;
         let max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -105,7 +114,7 @@ class HSLAColor extends Color {
             this.a = abs(a ?? this._randomValue() / 255);
         }
     }
-    css() { return `hsla(${[this.h, `${this.s * 100}%`, `${this.l * 100}%`, this.a]})`; }
+    css() { return `hsla(${[this.h, `${this.s * 100}%`, `${this.l * 100}%`, (this.a / 255)]})`; }
     toRGBA() { // Source: https://stackoverflow.com/a/9493060/17188891
         let r, g, b;
         if(this.s == 0) {
@@ -128,6 +137,10 @@ class HSLAColor extends Color {
         return new RGBAColor(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), Math.round(this.a * 255));
     }
 }
+
+// Some static colors.
+Color.BLACK = new HSLAColor(0, 0, 0);
+Color.WHITE = new HSLAColor(0, 0, 255);
 
 /**
  * The default CellGrid `options` object.
@@ -262,12 +275,15 @@ class CellGrid {
      * @param {number} y - Y coordinate.
      * @param {Color} color - The color to set.
      */
-    setPixel(x, y, color) {
-        if(!(color instanceof Color)) throw new Error("color must be a Color object.");
+    // setPixel(x, y, color = Color.WHITE) {
+    //     const img = this.ctx.createImageData(1, 1);
+    //     img.data[0] = color.r; img.data[1] = color.g; img.data[2] = color.b; img.data[3] = color.a;
+    //     this.ctx.putImageData(img, x % this.width, y % this.height);
+    // }
 
-        const img = this.ctx.createImageData(1, 1);
-        img.data[0] = color.r; img.data[1] = color.g; img.data[2] = color.b; img.data[3] = color.a;
-        this.ctx.putImageData(img, x % this.width, y % this.height);
+    setPixel(x, y, color = Color.BLACK) {
+        this.ctx.fillStyle = color.css();
+        this.ctx.fillRect(x, y, 1, 1);
     }
 
     /** Draws a line between two points. (x1, y1) => (x2, y2). */
@@ -477,6 +493,10 @@ class GameOfLife extends CellGrid {
      */
     constructor(canvas, options = {}) {
         super(canvas, options);
+
+        // Initialize another "back" matrix, so we dont need to create a new one every frame.
+        this.matrix2 = new Matrix(this.height, this.width);
+
         if(this.tiles.length > 2) {
             console.warn("`tiles` has a length larger than two; using only the first two tiles.")
         }
@@ -513,24 +533,62 @@ class GameOfLife extends CellGrid {
      * @param {number} x - X coordinate.
      * @returns {number}
      */
+    // getNeighbors(y, x) {
+    //     let neighbors = 0; // The amount of alive neighbors around `this.grid[i][j]`.
+    //     /* LEFT         */ neighbors += this.matrix.get(x - 1, y);
+    //     /* TOP LEFT     */ neighbors += this.matrix.get(x - 1, y - 1);
+    //     /* TOP          */ neighbors += this.matrix.get(x, y - 1);
+    //     /* TOP RIGHT    */ neighbors += this.matrix.get(x + 1, y - 1);
+    //     /* RIGHT        */ neighbors += this.matrix.get(x + 1, y);
+    //     /* BOTTOM RIGHT */ neighbors += this.matrix.get(x + 1, y + 1);
+    //     /* BOTTOM       */ neighbors += this.matrix.get(x, y + 1);
+    //     /* BOTTOM LEFT  */ neighbors += this.matrix.get(x - 1, y + 1);
+    //     return neighbors;
+    // }
+
+    // getNeighbors(y, x) {
+    //     let neighbors = 0;
+    //     /* LEFT         */ neighbors += this.matrix.matrix[mod(y, this.height)][mod(x - 1, this.width)];
+    //     /* TOP LEFT     */ neighbors += this.matrix.matrix[mod(y - 1, this.height)][mod(x - 1, this.width)];
+    //     /* TOP          */ neighbors += this.matrix.matrix[mod(y - 1, this.height)][mod(x, this.width)];
+    //     /* TOP RIGHT    */ neighbors += this.matrix.matrix[mod(y - 1, this.height)][mod(x + 1, this.width)];
+    //     /* RIGHT        */ neighbors += this.matrix.matrix[mod(y, this.height)][mod(x + 1, this.width)];
+    //     /* BOTTOM RIGHT */ neighbors += this.matrix.matrix[mod(y + 1, this.height)][mod(x + 1, this.width)];
+    //     /* BOTTOM       */ neighbors += this.matrix.matrix[mod(y + 1, this.height)][mod(x, this.width)];
+    //     /* BOTTOM LEFT  */ neighbors += this.matrix.matrix[mod(y + 1, this.height)][mod(x - 1, this.width)];
+    //     return neighbors;
+    // }
+
     getNeighbors(y, x) {
-        let neighbors = 0; // The amount of alive neighbors around `this.grid[i][j]`.
-        /* LEFT         */ neighbors += this.matrix.get(x - 1, y);
-        /* TOP LEFT     */ neighbors += this.matrix.get(x - 1, y - 1);
-        /* TOP          */ neighbors += this.matrix.get(x, y - 1);
-        /* TOP RIGHT    */ neighbors += this.matrix.get(x + 1, y - 1);
-        /* RIGHT        */ neighbors += this.matrix.get(x + 1, y);
-        /* BOTTOM RIGHT */ neighbors += this.matrix.get(x + 1, y + 1);
-        /* BOTTOM       */ neighbors += this.matrix.get(x, y + 1);
-        /* BOTTOM LEFT  */ neighbors += this.matrix.get(x - 1, y + 1);
+        // Instead of checking individually, loop through.
+        let neighbors = 0;
+        for(let ypos = y - 1; ypos <= y + 1; ypos++) {
+            for(let xpos = x - 1; xpos <= x + 1; xpos++) {
+                if(ypos == y && xpos == x) continue; // Our cell.
+                neighbors += this.matrix.get(xpos, ypos);
+            }
+        }
+        return neighbors;
+    }
+
+    getNeighbors(y, x) {
+        // Instead of checking individually, loop through.
+        let neighbors = 0;
+        for(let ypos = y - 1; ypos <= y + 1; ypos++) {
+            for(let xpos = x - 1; xpos <= x + 1; xpos++) {
+                if(ypos == y && xpos == x) continue; // Our cell.
+                neighbors += this.matrix.get(xpos, ypos);
+            }
+        }
         return neighbors;
     }
 
     /**
      * Steps the game of life.
+     * 
+     * For the sake of speed, we directly access the matrices here
      */
     step() {
-        const back = new Matrix(this.height, this.width);
         for(let i = 0; i < this.height; i++) { // Y
             for(let j = 0; j < this.width; j++) { // X
                 let neighbors = this.getNeighbors(i, j);
@@ -538,25 +596,25 @@ class GameOfLife extends CellGrid {
                 if(this.matrix.get(j, i) == 0) {
                     // If the cell is dead, and has exactly three neighbors, it becomes alive.
                     if(neighbors == 3) {
-                        back.set(j, i, 1);
+                        this.matrix2.matrix[i][j] = 1;
                     } else {
-                        back.set(j, i, 0);
+                        this.matrix2.matrix[i][j] = 0;
                     }
                 } else {
                     // If the cell is alive and has less than two neighbors or greater than 3 neighbors, it dies.
                     if(neighbors == 2 || neighbors == 3) {
-                        back.set(j, i, 1);
+                        this.matrix2.matrix[i][j] = 1;
                     } else {
-                        back.set(j, i, 0);
+                        this.matrix2.matrix[i][j] = 0;
                     }
                 }
 
-                if(back.get(j, i) != this.matrix.get(j, i)) {
-                    this.setPixel(j, i, this.tiles[back.get(j, i)]);
+                if(this.matrix2.matrix[i][j] != this.matrix.matrix[i][j]) {
+                    this.setPixel(j, i, this.tiles[this.matrix2.matrix[i][j]]);
                 }
             }
         }
-        this.matrix.matrix = back.matrix;
+        [this.matrix, this.matrix2] = [this.matrix2, this.matrix]; // Swap the two.
     }
 }
 

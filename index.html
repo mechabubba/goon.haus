@@ -17,89 +17,125 @@
             :root {
                 --bg-color: rgb(0, 0, 0);
                 --text-color: rgb(238, 238, 238);
-                --title-gradient: linear-gradient(90deg, hsl(239, 100%, 70%) 0%, hsl(0, 100%, 70%) 50%, hsl(32, 100%, 70%) 100%);
             }
 
             html {
-                /* background-image: url("assets/tile.png"); this'll eventually be something cooler... */
                 background-color: var(--bg-color);
                 color: var(--text-color);
             }
-            
+
             body {
+                padding: 2em;
+                font-family: "Roboto Mono", monospace;
+            }
+
+            article {
+                z-index: 5;
+                position: fixed;
+                padding: 1em;
+                width: 50%;
+                background-color: hsla(0, 0%, 100%, 0.1)
+            }
+
+            header > .ascii, main, footer {
+                white-space: pre-wrap;
+            }
+
+            header {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-            }
-
-            #wrapper {
-                display: grid;
-                grid-template-columns: minmax(auto, 400px) minmax(auto, 400px);
-                grid-template-areas:
-                    "header header"
-                    "about projects"
-                    "footer footer";
-                gap: 16px;
-                margin: 32px;
-            }
-
-            @media only screen and (max-width: 640px) {
-                #wrapper { display: block; }
             }
 
             .avatar {
-                height: 128px;
-                width: 128px;
-                /* background: hsl(0, 100%, 70%); */
-                border-radius: 50%;
+                float: left;
+                margin: 1em 1em 0 0;
             }
 
-            #header { grid-area: header; }
-            #about { grid-area: about; }
-            #projects { grid-area: projects; }
-            #footer { grid-area: footer; }
-
-            #header > h1 { margin-bottom: 0; }
-            .title {
-                background: var(--title-gradient);
-                background-clip: text;
-                -webkit-background-clip: text;
+            .ascii {
+                width: 100%;
                 color: transparent;
+                background: linear-gradient(90deg, hsl(0, 100%, 72%), hsl(32, 100%, 72%), hsl(61, 100%, 72%), hsl(104, 100%, 72%), hsl(194, 100%, 72%), hsl(234, 100%, 72%), hsl(263, 100%, 72%), hsl(313, 100%, 72%), hsl(0, 100%, 72%));
+                background-size: 200% 100%;
+                background-repeat: repeat;
+                background-clip: text;
+                animation: gradient 4s linear infinite;
             }
 
-            #header, #footer {
-                text-align: center;
+            @keyframes gradient {
+                0% { background-position: 0 0; }
+                100% { background-position: 200% 0; }
             }
 
-            li {
-                margin-bottom: 4px;
+            h1 {
+                display: inline;
+                font-size: 1em;
+                color: hsl(240, 100%, 75%);
+                margin: 0;
+            }
+
+            h1::before {
+                content: "# "
+            }
+
+            #cells {
+                z-index: 1;
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 100vw;
+                image-rendering: crisp-edges;
             }
         </style>
+        <script src="cells/cells.js"></script>
     </head>
     <body>
-        <div id="wrapper">
-            <div id="header">
+        <article>
+            <header>
                 <img class="avatar" src="assets/avatar.png">
-                <h1><span class="title">hey, i'm steve</span> 🌊</h1>
-            </div>
-            <div id="about">
-                <h1>About Me</h1>
-                <p>Welcome to my small space on the internet! My name is Steven, but I go by mechabubba in many places elsewhere.</p>
-                <p>I am a student studying Computer Science at the University of Iowa, a software developer, and a full stack enthusiast. I enjoy learning new things and applying what I learn inside of my projects and work. I am also a proud Linux user.</p>
-                <p>Outside of my degree, I am a competitive TF2 enthusiast and often spend my time biking outside.</p>
-            </div>
-            <div id="projects">
-                <h1>Projects</h1>
-                <ul>
-                    <li><a href="/bear/">bear</a> - My general use Discord bot.</li>
-                    <li><a href="/cells/">cells.js</a> - an experiment in cellular automation, inside of the HTML canvas. Implements Langton's Ant (and various other interesting "rules"), as well as Conway's Game of Life.</li>
-                    <li><a href="https://github.com/mechabubba/bomo">bomo</a> - A (work in progress) open source take on the classic Mattel card game UNO, playable via web browser.</li>
-                    <li>...and much more! I encourage you to check out my GitHub account if you're curious.</li>
-                </ul>
-            </div>
-            <div id="footer">
-                <a href="https://github.com/mechabubba">GitHub</a> | <a href="http://steamcommunity.com/profiles/76561198058209703">Steam</a>
-            </div>
-        </div>
+                <div class="ascii">                                                 __            
+       __                                       /\ \           
+  ___ /\_\    ___     __        ___    ___      \_\ \     __   
+/' _ `\/\ \  /'___\ /'__`\     /'___\ / __`\    /'_` \  /'__`\ 
+/\ \/\ \ \ \/\ \__//\  __/  __/\ \__//\ \L\ \__/\ \L\ \/\  __/ 
+\ \_\ \_\ \_\ \____\ \____\/\_\ \____\ \____/\_\ \___,_\ \____\
+ \/_/\/_/\/_/\/____/\/____/\/_/\/____/\/___/\/_/\/__,_ /\/____/</div>
+            </header>
+            <main>
+<h1>Who am I?</h1>
+My name is Steven, but I go by mechabubba elsewhere. I am a college student studying computer engineering at the University of Iowa, and a software developer on the side - I write nice.co.de. :)
+
+I enjoy learning new things and applying what I learn inside of my projects and work. Outside of my degree, I am a competitive TF2 enthusiast and often spend my time going for a nice bike ride.
+
+<h1>Cool Stuff</h1>
+- <a href="/bear/">bear</a>; My general use Discord bot.
+- <a href="https://github.com/mechabubba/bomo">bomo</a>; A (work in progress) open source take on the classic Mattel card game UNO, playable via web browser.
+...and much more! All of my code is open source; I encourage you to check out my GitHub account if you're curious of what I'm capable of.</main>
+            <footer>
+<h1>Social Stuff</h1>
+- <a href="https://github.com/mechabubba">GitHub</a>
+- <a href="http://steamcommunity.com/profiles/76561198058209703">Steam</a></footer>
+        </article>
+    <canvas id="cells"></canvas>
+    <script>
+        // Lifeform example. :)
+        const cells = document.getElementById("cells");
+        const tiles = [new RGBAColor(0, 0, 0), new RGBAColor(255, 255, 255)];
+        const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        const life = new GameOfLife(cells, {
+            zoom: mobile ? 2 : 8,
+            tiles: tiles,
+            stepCooldown: 20,
+            enableContextMenu: true
+        });
+
+        // override mouse move event
+        life.events.mousedown = (ev) => undefined;
+        life.events.mouseup = (ev) => undefined;
+        life._drawing = true;
+
+        life.start();
+    </script>
     </body>
 </html>
